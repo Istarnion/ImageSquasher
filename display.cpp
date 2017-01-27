@@ -136,8 +136,13 @@ static void convert_image_to_surface(const image &img, SDL_Surface **surf) {
                                  0x000000FF);
   
   const r32 *src = &img.data[0];
-  u8 *dst = (u8*)(*surf)->pixels;
-  for (int i=0; i<img.width * img.height * img.channels; ++i) {
-    *dst++ = (u8)(clamp(*src++, 0, 1) * 255.0f);
+  u32 *dst = (u32*)(*surf)->pixels;
+  for (int i=0; i<img.width * img.height; ++i) {
+    //*dst++ = (u8)(clamp<r32>(*src++, 0, 1) * 255.0f);
+    u8 r = (u8)((*src++) * 255.0f);
+    u8 g = (u8)((*src++) * 255.0f);
+    u8 b = (u8)((*src++) * 255.0f);
+    u8 a = (u8)((*src++) * 255.0f);
+    *dst++ = SDL_MapRGBA((*surf)->format, r, g, b, a);
   }
 }

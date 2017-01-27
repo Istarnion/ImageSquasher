@@ -2,13 +2,15 @@
 #define IMAGESQUASH_UTILS_H
 
 namespace imgsquash {
-  inline float clamp(float t, float min, float max) {
+  template<typename T>
+  inline T clamp(T t, T min, T max) {
     if (t < min) return min;
     if (t > max) return max;
     return t;
   }
   
-  inline float map(float val, float srcMin, float srcMax, float dstMin, float dstMax) {
+  template<typename T>
+  inline T map(T val, T srcMin, T srcMax, T dstMin, T dstMax) {
       return (val - srcMin) * (dstMax - dstMin) / (srcMax - srcMin) + dstMin;
   }
 }
