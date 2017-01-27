@@ -1,30 +1,145 @@
 #include "display.h"
+#include <assert.h>
+#include <cstring>
+#include <cstdio>
+#include <SDL_image.h>
+#include "utils.h"
 
 using namespace imgsquash;
 
-Display::Display(const std::string &title, int w, int h) : width(w), height(h) {
+display::display(const std::string &title, int w, int h) : width(w), height(h) {
   SDL_Init(SDL_INIT_VIDEO);
-  SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
+  window = SDL_CreateWindow(title.c_str(),
+                            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                            w, h,
+                            SDL_WINDOW_RESIZABLE);
+  assert(window);
+  
+  buffer_width = w/2 - 30;
+  buffer_heigth = h - 84;
+  
+  back_buffer = SDL_GetWindowSurface(window);
+  assert(back_buffer);
+  
+  primary = nullptr;
+  secondary = nullptr;
+  
+  bg = SDL_MapRGB(back_buffer->format, 0x2D, 0x2D, 0x2D);
+  black = SDL_MapRGB(back_buffer->format, 0, 0, 0);
+  
+  auto img_init_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
+  img_init_flags = IMG_Init(img_init_flags);
+  
+  if (img_init_flags & IMG_INIT_JPG) puts("JPG:\tOK");
+  else puts("JPG:\tFAIL");
+  if (img_init_flags & IMG_INIT_PNG) puts("PNG:\tOK");
+  else puts("PNG:\tFAIL");
+  if (img_init_flags & IMG_INIT_TIF) puts("TIF:\tOK");
+  else puts("TIF:\tFAIL");
+  if (img_init_flags & IMG_INIT_WEBP) puts("WEBP:\tOK");
+  else puts("WEBP:\tFAIL");
 }
 
-Display::~Display() {
+display::~display() {
   SDL_DestroyWindow(window);
+  IMG_Quit();
   SDL_Quit();
 }
 
-void Display::handle_window_event(const SDL_Event &event) {
+void display::blit_rect(int x, int y, int w, int h) {
+  SDL_Rect dst = {x, y, w, h};
+  SDL_FillRect(back_buffer, &dst, black);
 }
 
-inline int Display::get_width() const {
+void display::fit_rect(const SDL_Surface &surf, SDL_Rect &rect) const {
+  float target_ratio = (float)buffer_width / (float)buffer_heigth;
+  float surf_ratio = (float)surf.w / (float)surf.h;
+  
+  if (target_ratio > surf_ratio) {
+    rect.w = (int)(buffer_heigth * surf_ratio);
+    rect.h = buffer_heigth;
+  }
+  else {
+    rect.w = buffer_width;
+    rect.h = (int)(buffer_width / surf_ratio);
+  }
+}
+
+void display::present() {
+  SDL_FillRect(back_buffer, NULL, bg);
+  
+  SDL_Rect dst = {20, 20, buffer_width, buffer_heigth};
+  SDL_FillRect(back_buffer, &dst, black);
+  dst.x += buffer_width + 20;
+  SDL_FillRect(back_buffer, &dst, black);
+  
+  if (primary) {
+    fit_rect(*primary, dst);
+    dst.x = 20 + buffer_width/2 - dst.w/2;
+    dst.y = 20 + buffer_heigth/2 - dst.h/2;
+    SDL_BlitScaled(primary, NULL, back_buffer, &dst);
+    
+    if (secondary) {
+      dst.x = 40 + buffer_width + buffer_width/2 - dst.w/2;
+      SDL_BlitScaled(secondary, NULL, back_buffer, &dst);
+    }
+  }
+  
+  SDL_UpdateWindowSurface(window);
+}
+
+void display::handle_window_event(const SDL_Event &event) {
+  assert(event.type == SDL_WINDOWEVENT);
+  
+  switch(event.window.event) {
+  case SDL_WINDOWEVENT_RESIZED:
+      back_buffer = SDL_GetWindowSurface(window);
+      width = event.window.data1;
+      height = event.window.data2;
+      buffer_width = width/2 - 30;
+      buffer_heigth = height - 84;
+      break;
+    default: break;
+  }
+}
+
+inline int display::get_width() const {
   return width;
 }
 
-inline int Display::get_height() const {
+inline int display::get_height() const {
   return height;
 }
 
-void Display::set_primary_image(const SDL_Surface &surface) {}
-void Display::set_secondary_image(const SDL_Surface &surface) {}
+// Forward declare local function
+static void convert_image_to_surface(const image &img, SDL_Surface **surf);
 
-void Display::set_completion_string(const std::string &completions) {}
-void Display::set_command_buffer_string(const std::string &input) {}
+void display::set_primary_image(const image &img) {
+  if (primary) SDL_FreeSurface(primary);
+  convert_image_to_surface(img, &primary);
+}
+
+void display::set_secondary_image(const image &img) {
+  if (secondary) SDL_FreeSurface(secondary);
+  convert_image_to_surface(img, &secondary);
+}
+
+void display::set_completion_string(const std::string &completions) {} // TODO: Implement this!
+void display::set_command_buffer_string(const std::string &input) {} // TODO: Implement this!
+
+static void convert_image_to_surface(const image &img, SDL_Surface **surf) {
+  (*surf) = SDL_CreateRGBSurface(0, img.width, img.height, 32,
+                                 0xFF000000,
+                                 0x00FF0000,
+                                 0x0000FF00,
+                                 0x000000FF);
+  
+  Uint32 *pixel_buffer = (Uint32*)(*surf)->pixels;
+  for (const float *pixel=&img.data[0], *end=&img.data[img.data.size()]; pixel<end;) {
+    *pixel_buffer  = (Uint32)(clamp(*pixel++, 0, 1) * 255.0f) << 24;
+    *pixel_buffer |= (Uint32)(clamp(*pixel++, 0, 1) * 255.0f) << 16;
+    *pixel_buffer |= (Uint32)(clamp(*pixel++, 0, 1) * 255.0f) << 8;
+    *pixel_buffer |= (Uint32)(clamp(*pixel++, 0, 1) * 255.0f);
+    ++pixel_buffer;
+  }
+}

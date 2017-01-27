@@ -1,9 +1,20 @@
 #include <SDL.h>
 
 #include "display.h"
+#include "mutator.h"
 
 int main() {
-  imgsquash::Display display("Image Squasher", 800, 600);
+  imgsquash::display display("Image Squasher", 1280, 768);
+  
+  imgsquash::mutator mutator;
+  mutator.make_flat_primary(800, 600, 0x020D10FF);
+  
+  auto primaryImg = mutator.get_primary();
+  display.set_primary_image(*primaryImg);
+  
+  mutator.make_greyscale();
+  auto secondaryImg = mutator.get_secondary();
+  display.set_secondary_image(*secondaryImg);
   
   bool running = true;
   SDL_Event event;
@@ -11,11 +22,14 @@ int main() {
     while(SDL_PollEvent(&event)) {
       switch(event.type) {
         case SDL_QUIT: running = false; break;
+        case SDL_WINDOWEVENT: display.handle_window_event(event);
         default: break;
       }
     }
     
     if (running) {
+      display.present();
+      
       SDL_Delay(30);
     }
   }
