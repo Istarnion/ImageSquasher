@@ -22,6 +22,7 @@ namespace imgsquash {
     
     bool load_image(const std::string &filename);
     void make_greyscale();
+    void make_inverted();
     void make_identity();
     void make_flat_primary(i32 w, i32 h, color col);
   };

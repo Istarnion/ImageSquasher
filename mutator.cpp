@@ -75,6 +75,25 @@ void mutator::make_greyscale() {
   }
 }
 
+void mutator::make_inverted() {
+  r32 *primaryComponent = &primary->data[0];
+  r32 *secondaryComponent = &secondary->data[0];
+  u32 numPixels = primary->width * primary->height;
+  r32 r, g, b;
+  r32 alpha;
+  for(u32 i=0; i<numPixels; ++i) {
+    r = 1.0f - (*primaryComponent++);
+    g = 1.0f - (*primaryComponent++);
+    b = 1.0f - (*primaryComponent++);
+    alpha = (*primaryComponent++);
+    
+    *secondaryComponent++ = r;
+    *secondaryComponent++ = g;
+    *secondaryComponent++ = b;
+    *secondaryComponent++ = alpha;
+  }
+}
+
 void mutator::make_identity() {
   std::copy(primary->data.begin(), primary->data.end(), secondary->data.begin());
 }

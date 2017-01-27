@@ -7,8 +7,9 @@
 int main() {
   imgsquash::display display("Image Squasher", 1280, 768);
   
+  // Do some stuff for testing until we implement the command module
   imgsquash::mutator mutator;
-  bool result = mutator.load_image("/home/istarnion/Dropbox/personalProjects/imagesquasher/res/screenshotRaycast.png");
+  bool result = mutator.load_image("/home/istarnion/Dev/C++/imagesquasher/res/test.png");
 
   //bool result = true;
   //mutator.make_flat_primary(800, 600, color(1, 0.2f, 0.2f));
@@ -17,7 +18,7 @@ int main() {
     auto primaryImg = mutator.get_primary();
     display.set_primary_image(*primaryImg);
     
-    mutator.make_greyscale();
+    mutator.make_inverted();
     //mutator.make_identity();
     auto secondaryImg = mutator.get_secondary();
     display.set_secondary_image(*secondaryImg);
