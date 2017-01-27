@@ -5,6 +5,7 @@
 #include <string>
 
 #include "image.h"
+#include "types.h"
 
 namespace imgsquash {
   class mutator {
@@ -20,7 +21,7 @@ namespace imgsquash {
     
     bool load_image(const std::string &filename);
     void make_greyscale();
-    void make_flat_primary(int w, int h, unsigned int color);
+    void make_flat_primary(i32 w, i32 h, u32 color);
   };
 }
 

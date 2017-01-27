@@ -4,10 +4,11 @@
 #include <cstdio>
 #include <SDL_image.h>
 #include "utils.h"
+#include "types.h"
 
 using namespace imgsquash;
 
-display::display(const std::string &title, int w, int h) : width(w), height(h) {
+display::display(const std::string &title, i32 w, i32 h) : width(w), height(h) {
   SDL_Init(SDL_INIT_VIDEO);
   window = SDL_CreateWindow(title.c_str(),
                             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -46,22 +47,22 @@ display::~display() {
   SDL_Quit();
 }
 
-void display::blit_rect(int x, int y, int w, int h) {
+void display::blit_rect(i32 x, i32 y, i32 w, i32 h) {
   SDL_Rect dst = {x, y, w, h};
   SDL_FillRect(back_buffer, &dst, black);
 }
 
 void display::fit_rect(const SDL_Surface &surf, SDL_Rect &rect) const {
-  float target_ratio = (float)buffer_width / (float)buffer_heigth;
-  float surf_ratio = (float)surf.w / (float)surf.h;
+  r32 target_ratio = (r32)buffer_width / (r32)buffer_heigth;
+  r32 surf_ratio = (r32)surf.w / (r32)surf.h;
   
   if (target_ratio > surf_ratio) {
-    rect.w = (int)(buffer_heigth * surf_ratio);
+    rect.w = (i32)(buffer_heigth * surf_ratio);
     rect.h = buffer_heigth;
   }
   else {
     rect.w = buffer_width;
-    rect.h = (int)(buffer_width / surf_ratio);
+    rect.h = (i32)(buffer_width / surf_ratio);
   }
 }
 
@@ -103,11 +104,11 @@ void display::handle_window_event(const SDL_Event &event) {
   }
 }
 
-inline int display::get_width() const {
+inline i32 display::get_width() const {
   return width;
 }
 
-inline int display::get_height() const {
+inline i32 display::get_height() const {
   return height;
 }
 
@@ -134,12 +135,9 @@ static void convert_image_to_surface(const image &img, SDL_Surface **surf) {
                                  0x0000FF00,
                                  0x000000FF);
   
-  Uint32 *pixel_buffer = (Uint32*)(*surf)->pixels;
-  for (const float *pixel=&img.data[0], *end=&img.data[img.data.size()]; pixel<end;) {
-    *pixel_buffer  = (Uint32)(clamp(*pixel++, 0, 1) * 255.0f) << 24;
-    *pixel_buffer |= (Uint32)(clamp(*pixel++, 0, 1) * 255.0f) << 16;
-    *pixel_buffer |= (Uint32)(clamp(*pixel++, 0, 1) * 255.0f) << 8;
-    *pixel_buffer |= (Uint32)(clamp(*pixel++, 0, 1) * 255.0f);
-    ++pixel_buffer;
+  const r32 *src = &img.data[0];
+  u8 *dst = (u8*)(*surf)->pixels;
+  for (int i=0; i<img.width * img.height * img.channels; ++i) {
+    *dst++ = (u8)(clamp(*src++, 0, 1) * 255.0f);
   }
 }

@@ -7,6 +7,7 @@
 #include <SDL_image.h>
 
 #include "utils.h"
+#include "types.h"
 
 using namespace imgsquash;
 
@@ -23,10 +24,10 @@ bool mutator::load_image(const std::string &filename) {
   if (surf)
   {
     primary = std::make_unique<image>(surf->w, surf->h);
-    primary->fill((Uint32*)surf->pixels);
+    primary->fill((u8*)surf->pixels, surf->format->BitsPerPixel == 32);
     
     secondary = std::make_unique<image>(surf->w, surf->h);
-    secondary->fill((Uint32)0);
+    secondary->fill((u32)0);
     
     SDL_FreeSurface(surf);
     return true;
@@ -35,11 +36,11 @@ bool mutator::load_image(const std::string &filename) {
 }
 
 void mutator::make_greyscale() {
-  float *primaryComponent = &primary->data[0];
-  float *secondaryComponent = &secondary->data[0];
-  size_t numPixels = primary->width * primary->height;
-  float avg;
-  for(size_t i=0; i<numPixels; ++i) {
+  r32 *primaryComponent = &primary->data[0];
+  r32 *secondaryComponent = &secondary->data[0];
+  u32 numPixels = primary->width * primary->height;
+  r32 avg;
+  for(u32 i=0; i<numPixels; ++i) {
     avg = 0;
     avg += *primaryComponent++;
     avg += *primaryComponent++;
@@ -54,9 +55,9 @@ void mutator::make_greyscale() {
   }
 }
 
-void mutator::make_flat_primary(int w, int h, Uint32 color) {
+void mutator::make_flat_primary(i32 w, i32 h, u32 color) {
   primary = std::make_unique<image>(w, h);
   secondary = std::make_unique<image>(w, h);
   primary->fill(color);
-  secondary->fill((Uint32)0);
+  secondary->fill((u32)0);
 }
