@@ -12,7 +12,7 @@ int main() {
   bool result = mutator.load_image("/home/istarnion/Dev/C++/imagesquasher/res/einstein.jpg");
 
   if (result) {
-    mutator.make_inverted();
+    mutator.make_embossed();
     
     auto primaryImg = mutator.get_primary();
     display.set_primary_image(*primaryImg);

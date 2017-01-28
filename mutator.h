@@ -27,6 +27,8 @@ namespace imgsquash {
     void make_identity();
     void make_sharpen();
     void make_blur();
+    void make_embossed();
+    void make_outline();
     
     void secondary_to_primary();
     

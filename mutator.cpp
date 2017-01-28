@@ -223,6 +223,26 @@ void mutator::make_blur() {
   convolve_kernel3(*primary, *secondary, kernel);
 }
 
+void mutator::make_embossed() {
+  r32 kernel[9] = {
+    -2, -1,  0,
+    -1,  1,  1,
+     0,  1,  2
+  };
+  
+  convolve_kernel3(*primary, *secondary,kernel);
+}
+
+void mutator::make_outline() {
+  r32 kernel[9] = {
+    -1, -1, -1,
+    -1,  8, -1,
+    -1, -1, -1
+  };
+  
+  convolve_kernel3(*primary, *secondary,kernel);
+}
+
 void mutator::secondary_to_primary() {
   primary = std::make_unique<image>(*secondary);
   secondary->clear();
