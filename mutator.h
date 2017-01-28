@@ -25,6 +25,7 @@ namespace imgsquash {
     void make_inverted();
     void make_identity();
     void make_sharpen();
+    void make_blur();
     void make_flat_primary(i32 w, i32 h, color col);
   };
 }

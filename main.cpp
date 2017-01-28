@@ -15,7 +15,7 @@ int main() {
     auto primaryImg = mutator.get_primary();
     display.set_primary_image(*primaryImg);
     
-    mutator.make_sharpen();
+    mutator.make_blur();
     auto secondaryImg = mutator.get_secondary();
     display.set_secondary_image(*secondaryImg);
   }

@@ -213,6 +213,16 @@ void mutator::make_sharpen() {
   convolve_kernel3(*primary, *secondary, kernel);
 }
 
+void mutator::make_blur() {
+  r32 kernel[9] = {
+    0.0625f, 0.1250f, 0.0625f,
+    0.1250f, 0.2500f, 0.1250f,
+    0.0625f, 0.1250f, 0.0625f
+  };
+  
+  convolve_kernel3(*primary, *secondary, kernel);
+}
+
 void mutator::make_flat_primary(i32 w, i32 h, color col) {
   primary = std::make_unique<image>(w, h);
   secondary = std::make_unique<image>(w, h);
