@@ -9,17 +9,13 @@ int main() {
   
   // Do some stuff for testing until we implement the command module
   imgsquash::mutator mutator;
-  bool result = mutator.load_image("/home/istarnion/Dev/C++/imagesquasher/res/test.png");
+  bool result = mutator.load_image("/home/istarnion/Dev/C++/imagesquasher/res/einstein.jpg");
 
-  //bool result = true;
-  //mutator.make_flat_primary(800, 600, color(1, 0.2f, 0.2f));
-  
   if (result) {
     auto primaryImg = mutator.get_primary();
     display.set_primary_image(*primaryImg);
     
-    mutator.make_inverted();
-    //mutator.make_identity();
+    mutator.make_sharpen();
     auto secondaryImg = mutator.get_secondary();
     display.set_secondary_image(*secondaryImg);
   }
