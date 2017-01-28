@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cstring>
+#include <algorithm>
 #include "types.h"
 #include "utils.h"
 #include "color.h"
@@ -17,6 +18,11 @@ namespace imgsquash {
     
     image(i32 w, i32 h): width(w), height(h), pitch(w*sizeof(r32)), channels(4) {
       data.resize(w*h*channels);
+    }
+    
+    image(const image &old) : width(old.width), height(old.height), pitch(old.pitch), channels(old.channels) {
+      data.resize(width*height*channels);
+      std::copy(old.data.begin(), old.data.end(), data.begin());
     }
 
     void clear() {

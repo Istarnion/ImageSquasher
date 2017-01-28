@@ -223,6 +223,11 @@ void mutator::make_blur() {
   convolve_kernel3(*primary, *secondary, kernel);
 }
 
+void mutator::secondary_to_primary() {
+  primary = std::make_unique<image>(*secondary);
+  secondary->clear();
+}
+
 void mutator::make_flat_primary(i32 w, i32 h, color col) {
   primary = std::make_unique<image>(w, h);
   secondary = std::make_unique<image>(w, h);

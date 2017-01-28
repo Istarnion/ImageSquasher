@@ -12,10 +12,19 @@ int main() {
   bool result = mutator.load_image("/home/istarnion/Dev/C++/imagesquasher/res/einstein.jpg");
 
   if (result) {
+    mutator.make_blur();
+    mutator.secondary_to_primary();
+    mutator.make_blur();
+    mutator.secondary_to_primary();
+    mutator.make_blur();
+    mutator.secondary_to_primary();
+    mutator.make_inverted();
+    mutator.secondary_to_primary();
+    mutator.make_sharpen();
+    
     auto primaryImg = mutator.get_primary();
     display.set_primary_image(*primaryImg);
     
-    mutator.make_blur();
     auto secondaryImg = mutator.get_secondary();
     display.set_secondary_image(*secondaryImg);
   }
