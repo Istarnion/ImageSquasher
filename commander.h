@@ -8,7 +8,6 @@
 
 #include <SDL.h>
 
-#include "types.h"
 #include "mutator.h"
 #include "display.h"
 
