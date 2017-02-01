@@ -161,6 +161,8 @@ bool mutator::load_image(const std::string &filename) {
 }
 
 void mutator::make_greyscale() {
+  if (!primary) return;
+  
   r32 *primaryComponent = &primary->data[0];
   r32 *secondaryComponent = &secondary->data[0];
   u32 numPixels = primary->width * primary->height;
@@ -181,6 +183,8 @@ void mutator::make_greyscale() {
 }
 
 void mutator::make_inverted() {
+  if (!primary) return;
+  
   r32 *primaryComponent = &primary->data[0];
   r32 *secondaryComponent = &secondary->data[0];
   u32 numPixels = primary->width * primary->height;
@@ -200,10 +204,14 @@ void mutator::make_inverted() {
 }
 
 void mutator::make_identity() {
+  if (!primary) return;
+  
   std::copy(primary->data.begin(), primary->data.end(), secondary->data.begin());
 }
 
 void mutator::make_sharpen() {
+  if (!primary) return;
+  
   r32 kernel[9] = {
      0.0f, -1.0f,  0.0f,
     -1.0f,  5.0f, -1.0f,
@@ -214,6 +222,8 @@ void mutator::make_sharpen() {
 }
 
 void mutator::make_blur() {
+  if (!primary) return;
+  
   r32 kernel[9] = {
     0.0625f, 0.1250f, 0.0625f,
     0.1250f, 0.2500f, 0.1250f,
@@ -224,6 +234,8 @@ void mutator::make_blur() {
 }
 
 void mutator::make_embossed() {
+  if (!primary) return;
+  
   r32 kernel[9] = {
     -2, -1,  0,
     -1,  1,  1,
@@ -234,6 +246,8 @@ void mutator::make_embossed() {
 }
 
 void mutator::make_outline() {
+  if (!primary) return;
+  
   r32 kernel[9] = {
     -1, -1, -1,
     -1,  8, -1,
@@ -244,8 +258,10 @@ void mutator::make_outline() {
 }
 
 void mutator::secondary_to_primary() {
+  if (!primary || !secondary) return;
+  
   primary = std::make_unique<image>(*secondary);
-  secondary->clear();
+  secondary = std::make_unique<image>(primary->width, primary->height);
 }
 
 void mutator::make_flat_primary(i32 w, i32 h, color col) {

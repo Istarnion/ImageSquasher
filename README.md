@@ -5,7 +5,7 @@ This is a simple tool I'm making to learn more about image processing.
 It is very much a work in progress, but the goal is to have a useful utility for enhancing images through filters, while getting quick feedback in the GUI.
 
 ![Example image of invert-filter](screenshotImgSquasher.png)
-_A simple filter that invert colors_
+_Einstein, after the application of numerous filters_
 
 ## Architecture
 The program has three distinct modules;

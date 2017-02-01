@@ -17,8 +17,10 @@ namespace imgsquash {
     mutator *img_mutator;
     display *gui;
 
-    std::unordered_map<std::string, std::function<void (std::string, std::vector<std::string>)>> command_list;
+    std::unordered_map<std::string, std::function<void (std::vector<std::string>&)>> command_list;
     std::string user_input;
+    
+    void parse_command(std::string &command);
     
   public:
     commander(mutator *m, display *d);

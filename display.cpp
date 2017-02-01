@@ -24,6 +24,8 @@ display::display(const std::string &title, i32 w, i32 h) : width(w), height(h) {
   
   primary = nullptr;
   secondary = nullptr;
+  command_buffer = nullptr;
+  error_buffer = nullptr;
   
   bg = SDL_MapRGB(back_buffer->format, 0x2D, 0x2D, 0x2D);
   black = SDL_MapRGB(back_buffer->format, 0, 0, 0);
@@ -39,12 +41,26 @@ display::display(const std::string &title, i32 w, i32 h) : width(w), height(h) {
   else puts("TIF:\tFAIL");
   if (img_init_flags & IMG_INIT_WEBP) puts("WEBP:\tOK");
   else puts("WEBP:\tFAIL");
+  
+  TTF_Init();
 }
 
 display::~display() {
   SDL_DestroyWindow(window);
+  TTF_CloseFont(font);
+  SDL_StopTextInput();
+  
+  TTF_Quit();
   IMG_Quit();
   SDL_Quit();
+}
+
+bool display::setup(const std::string &res_folder_path) {
+  font = TTF_OpenFont((res_folder_path + "Tuffy.ttf").c_str(), 18);
+  
+  SDL_StartTextInput();
+  
+  return font;
 }
 
 void display::blit_rect(i32 x, i32 y, i32 w, i32 h) {
@@ -84,6 +100,17 @@ void display::present() {
       dst.x = 40 + buffer_width + buffer_width/2 - dst.w/2;
       SDL_BlitScaled(secondary, NULL, back_buffer, &dst);
     }
+  }
+  
+  if (error_buffer) {
+    dst.x = 20;
+    dst.y = height - 10 - error_buffer->h;
+    SDL_BlitSurface(error_buffer, NULL, back_buffer, &dst);
+  }
+  else if (command_buffer) {
+    dst.x = 20;
+    dst.y = height - 10 - command_buffer->h;
+    SDL_BlitSurface(command_buffer, NULL, back_buffer, &dst);
   }
   
   SDL_UpdateWindowSurface(window);
@@ -126,7 +153,16 @@ void display::set_secondary_image(const image &img) {
 }
 
 void display::set_completion_string(const std::string &completions) {} // TODO: Implement this!
-void display::set_command_buffer_string(const std::string &input) {} // TODO: Implement this!
+
+void display::set_command_buffer_string(const std::string &input) {
+  error_buffer = nullptr;
+  command_buffer = TTF_RenderText_Solid(font, input.c_str(), {255, 255, 255, 255});
+}
+
+void display::set_error_buffer_string(const std::string &input) {
+  puts("ERROR STRING");
+  error_buffer = TTF_RenderText_Solid(font, input.c_str(), {255, 50, 50, 255});
+}
 
 static void convert_image_to_surface(const image &img, SDL_Surface **surf) {
   (*surf) = SDL_CreateRGBSurface(0, img.width, img.height, 32,

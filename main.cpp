@@ -9,6 +9,10 @@ int main() {
   imgsquash::mutator mutator;
   imgsquash::commander commander(&mutator, &display);
   
+  if (!display.setup("/home/istarnion/Dev/C++/imagesquasher/res/")) {
+    return -1;
+  }
+  
   bool running = true;
   SDL_Event event;
   while(running) {

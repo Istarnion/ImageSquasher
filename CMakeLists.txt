@@ -12,6 +12,10 @@ include_directories(${SDL2_INCLUDE_DIR})
 find_package(SDL2_image REQUIRED)
 include_directories(${SDL2IMAGE_INCLUDE_DIR})
 
-add_executable(imagesquasher main.cpp display.cpp mutator.cpp)
+find_package(SDL2_ttf REQUIRED)
+include_directories(${SDL2_TTF_INCLUDE_DIRS})
+
+add_executable(imagesquasher main.cpp display.cpp mutator.cpp commander.cpp)
 target_link_libraries(imagesquasher ${SDL2_LIBRARY})
 target_link_libraries(imagesquasher ${SDL2IMAGE_LIBRARY})
+target_link_libraries(imagesquasher ${SDL2_TTF_LIBRARIES})

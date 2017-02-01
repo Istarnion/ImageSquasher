@@ -3,6 +3,7 @@
 
 #include <string>
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include "image.h"
 #include "types.h"
 
@@ -17,6 +18,10 @@ namespace imgsquash {
     
     SDL_Surface *back_buffer;
     SDL_Surface *primary, *secondary;
+    SDL_Surface *command_buffer;
+    SDL_Surface *error_buffer;
+    
+    TTF_Font *font;
     
     void blit_rect(i32 x, i32 y, i32 w, i32 h);
     void fit_rect(const SDL_Surface &surf, SDL_Rect &rect) const;
@@ -24,6 +29,8 @@ namespace imgsquash {
   public:
     display(const std::string &title, i32 width, i32 height);
     ~display();
+    
+    bool setup(const std::string &res_folder_path);
     
     void present();
     
@@ -37,6 +44,7 @@ namespace imgsquash {
     
     void set_completion_string(const std::string &completions);
     void set_command_buffer_string(const std::string &input);
+    void set_error_buffer_string(const std::string &input);
   };
 }
 
